@@ -1,0 +1,37 @@
+version: '3'
+services:
+  python-model:
+    build:
+      context: ./docker
+    container_name: python-model
+    networks:
+      - ergasia-net
+    ports:
+      - "5000:5000"
+
+  node-server:
+    build:
+      context: ./node-server
+    container_name: node-server
+    depends_on:
+      - python-model
+    ports:
+      - "3000:3000"
+    networks:
+      - ergasia-net
+
+  node-red:
+    image: nodered/node-red
+    container_name: node-red
+    ports:
+      - "1880:1880"
+    volumes:
+      - ./flows:/data
+    depends_on:
+      - node-server
+    networks:
+      - ergasia-net
+
+networks:
+  ergasia-net:
+    driver: bridge
